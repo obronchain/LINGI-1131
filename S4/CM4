@@ -1,0 +1,40 @@
+Determinitic dataflow programming
+	- stream
+	- ping-ông example
+	-batch versus incremental 
+	- producer consumer
+	- multiple readers
+	- filter and Map 
+	- Agent
+
+
+choise of each step wich thread is "nondeterminism"
+separatecomponant that makes choices
+	-> programmer not in control
+	-> thread independent
+
+choises should not break the program. This is the main difficulty with concurrency
+
+Exectuion tree
+	-> summary of all possible choices in one diagram
+	-> example 
+
+-> see ping-pong example 
+	-naive solution relying on the scheduler, doesn't work 
+	-threads need to synchronize
+	-shared channel between threads
+		-> stream = list with unbound taill an extended it by birding
+	- we used token passsing technique 
+
+Agent is a recursive finctopn in a thread tail recursive -> stack does not grow during the execution
+	Input : stream(s)
+	Output : stream(s)
+
+
+Sieve of Erotos themes
+
+	idea : 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
+		|
+		|
+	stream of prime number 
+
