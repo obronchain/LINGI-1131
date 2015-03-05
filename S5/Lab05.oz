@@ -1,3 +1,4 @@
+% exo 1
 declare
 fun{Numbers N I J}
    {Delay 500}
@@ -30,8 +31,8 @@ fun{FilterList Xs Ys}
    local
       fun{IsIn In Ys}
 	 case Ys of nil then false
-	 [] H|T then if (H==In) then {IsIn In T}
-		     else false end
+	 [] H|T then if (H==In) then true
+		     else {IsIn In T} end
 	 end
       end
    in
@@ -56,4 +57,41 @@ in
    {Browse Filter}
    {Browse Sum}
    {Browse Count}
+end
+
+
+%exo2
+declare
+fun{Not Val}
+   (Val+1) mod 2
+end
+
+declare
+fun{NotGate In}
+   case In of H|T then
+      {Not H}|{NotGate T}
+   else
+      nil
+   end
+end
+
+declare
+fun{AndGate In1 In2}
+   case In1|In2 of (H1|T1)|(H2|T2)
+   then
+      (H1*H2)|{AndGate T1 T2}
+   end
+end
+
+declare
+fun{OrGate In1 In2}
+   case In1|In2 of (H1|T1)|(H2|T2)
+   then
+      (H1+H2-(H2*H1))|{OrGate T1 T2}
+   end
+end
+
+declare
+fun{Simulate G Input}
+   
 end
