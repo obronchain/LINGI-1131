@@ -68,6 +68,7 @@ end
 
 declare
 fun{NotGate In}
+   {Delay 500}
    case In of H|T then
       {Not H}|{NotGate T}
    else
@@ -77,6 +78,7 @@ end
 
 declare
 fun{AndGate In1 In2}
+   {Delay 500}
    case In1|In2 of (H1|T1)|(H2|T2)
    then
       (H1*H2)|{AndGate T1 T2}
@@ -85,6 +87,7 @@ end
 
 declare
 fun{OrGate In1 In2}
+   {Delay 500}
    case In1|In2 of (H1|T1)|(H2|T2)
    then
       (H1+H2-(H2*H1))|{OrGate T1 T2}
@@ -93,5 +96,32 @@ end
 
 declare
 fun{Simulate G Input}
-   
+   case G of gate(value:X Y Z)
+   then
+      %{Browse  'matching1'}
+      if (X == 'or') then
+	 thread {OrGate {Simulate Y Input} {Simulate Z Input}} end
+      elseif (X == 'and') then
+	 thread {AndGate {Simulate Y Input} {Simulate Z Input}} end
+      end  
+   [] gate(value:X Y)
+   then
+      %{Browse' matching2'}
+       if( X=='not') then
+          thread {NotGate {Simulate Y Input}} end
+       end
+   [] input(X) then
+      %{Browse 'matching3'}
+      %{Browse Input.X}
+      Input.X
+   end	 
 end
+
+local
+   G = gate(value:'not' input(x) )
+   Input = input(x:1|0|1|0|_ y:0|1|0|1|_ z:1|1|0|0|_ )
+in
+   {Browse {Simulate G Input}}
+end
+
+{Browse 42}
