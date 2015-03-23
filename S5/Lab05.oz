@@ -107,9 +107,9 @@ fun{Simulate G Input}
    [] gate(value:X Y)
    then
       %{Browse' matching2'}
-       if( X=='not') then
-          thread {NotGate {Simulate Y Input}} end
-       end
+      if( X=='not') then
+	 thread {NotGate {Simulate Y Input}} end
+      end
    [] input(X) then
       %{Browse 'matching3'}
       %{Browse Input.X}
@@ -125,3 +125,15 @@ in
 end
 
 {Browse 42}
+
+%exo 3 Termination of threads
+%a
+declare
+L1 L2 F
+L1 = [1 2 3]
+F = fun {$ X} {Delay 200} X*X end
+
+thread L2 = {Map L1 F}  end
+{Wait L2}
+
+{Show 'trol'}
