@@ -33,7 +33,6 @@ X={F 111}
 
 % Lazy functions are syntax for WaitNeeded
 % Translate into kernel language
-
 % Nonlazy version
 declare
 proc {F A R}
@@ -80,6 +79,7 @@ proc {Touch L N}
 end
 
 {Touch L 10}
+{Browse L}
 
 {Touch L 20}
 
@@ -92,7 +92,6 @@ end
 
 
 % Producer-consumer
-
 % Eager version (producer has the limit)
 declare
 fun {Producer L H}
@@ -100,6 +99,7 @@ fun {Producer L H}
    else L|{Producer L+1 H}
    end
 end
+
 fun {Consumer L A}
    case L of H|T then
       {Consumer T A+H}
@@ -117,6 +117,7 @@ declare
 fun lazy {ProducerL L}
    L|{ProducerL L+1}
 end
+
 fun {ConsumerL L A N}
    if N==0 then A
    else
@@ -202,6 +203,7 @@ in
    thread End={List.drop Xs N} end
    Ys={Loop Xs End}
 end
+
 declare S1 S2 S3 in
 S1={Prod 1}
 {BB S1 S2 3}
