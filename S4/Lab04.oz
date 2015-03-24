@@ -45,61 +45,112 @@ in
    {Browse Result}
 end
 
-%exo 3 marche pas 
+
+% exo 3
 declare
-proc{PassingTheToken Id Tin Tout}
+proc {PassingTheToken Id Tin Tout}
    case Tin of H|T then X in
-      {Browse Id#H}
+      {Show Id#H}
       {Delay 1000}
       Tout = H|X
       {PassingTheToken Id T X}
-   []nil then skip
+   [] nil then
+      skip
    end
 end
 
 local
-   T1 = ok|_|_
-   T2
-   T3
+   S1 S2 S3
 in
-   thread {PassingTheToken 1 T1 T2}end
-   thread {PassingTheToken 2 T2 T3}end
-   thread {PassingTheToken 3 T3 T1}end
+   thread {PassingTheToken 1 unit|S1 S2} end
+   thread {PassingTheToken 2 S2 S3} end
+   thread {PassingTheToken 3 S3 S1} end
 end
 
-
-%exo 4 
+%exo Foo at the Bar
 declare
-fun{Bar In NProduce NDrink}
-   if (NProcude - NDrink < 4) then
-      {Delay 500}
-      beer|{Bar In NProduce+1 NDrink}
+fun{Bar N In}
+   if N < 4 then
+      {Delay 4000}
+      {Browse 'beer produced'}
+      {Browse N}
+      beer|{Bar N+1 In}
    else
       case In of H|T then
-	 {Delay 500}
-	 beer|{Bar In NProduce+1 NDrink+1}
+	 {Bar N-1 T}
       end
    end
 end
 
 declare
 fun{Foo In N}
-   case In of nil then nil
-   [] H|T then
-      {Delay 1200}
-      {Browse 'FooDrinkNIs'}
+   case In of H|T then
+      {Delay 5000}
+      {Browse 'Foo you drink'}
       {Browse N}
-      N+1|{Foo T N+1}
+      drinked|{Foo T N+1}
    end
 end
 
 local
-   Beer
-   F
+   Beers
+   Drinked
 in
-   thread F = {Foo Beer 0} end
-   thread Beer = {Bar F 0 0} end
-   {Browse Beer}
-   {Browse F}
+   thread Beers = {Bar 0 Drinked} end
+   thread Drinked = {Foo Beers 0} end
+end
+
+% exo 3
+declare
+proc {PassingTheToken Id Tin Tout}
+   case Tin of H|T then X in
+      {Show Id#H}
+      {Delay 1000}
+      Tout = H|X
+      {PassingTheToken Id T X}
+   [] nil then
+      skip
+   end
+end
+
+local
+   S1 S2 S3
+in
+   thread {PassingTheToken 1 unit|S1 S2} end
+   thread {PassingTheToken 2 S2 S3} end
+   thread {PassingTheToken 3 S3 S1} end
+end
+
+%exo Foo at the Bar
+declare
+fun{Bar N In}
+   if N < 4 then
+      {Delay 4000}
+      {Browse 'beer produced'}
+      {Browse N}
+      beer|{Bar N+1 In}
+   else
+      case In of H|T then
+	 {Bar N-1 T}
+      end
+   end
+end
+
+declare
+fun{Foo In N}
+   case In of H|T then
+      {Delay 5000}
+      {Browse 'Foo you drink'}
+      {Browse N}
+      drinked|{Foo T N+1}
+   end
+end
+
+local
+   Beers
+   Drinked
+in
+   thread Beers = {Bar 0 Drinked} end
+   thread Drinked = {Foo Beers 0} end
 end
 
