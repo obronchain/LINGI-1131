@@ -112,3 +112,63 @@ fun{WaitOrValue X Y}
    end 
 end
 
+declare X Y
+{Browse {WaitOrValue X Y}}
+X = 42 
+
+%exo 6
+declare N WaitOrValue Counter X Y X1 X2 X3 X4 X5 Y1 Y2 Y3 Y4 Y5 Result
+fun{WaitOrValue X Y }
+   {Browse 'Waiting'}
+   local LocX={NewCell 0}  LocY={NewCell 0}  Val in
+      thread {Wait X} if @LocX==0 then LocY:= 1 Val='x' else skip end end
+      thread {Wait Y} if @LocY==0 then LocX:= 1 Val='y' else skip end end
+      {Wait Val}
+      Val
+   end 
+end
+
+fun{Counter X Y }
+   local AddL Run in
+      fun{AddL L E}
+	 case L of nil then E#1|nil
+	 [] C#N|Next then
+	    if C==E then C#(N+1)|Next
+	    else C#N|{AddL Next E}
+	    end
+	 end
+      end
+      fun{Run X Y  Actual}
+	 local Other In in 
+	    In = {WaitOrValue X Y}
+	    if In=='x' then
+	       case X of nil then nil
+	       [] H|T then local Acc in
+			      Acc={AddL Actual H}
+			      Acc|{Run T Y Acc}
+			   end
+	       end
+	    else
+	       case Y of nil then nil
+	       [] H|T then local Acc in
+			      Acc={AddL Actual H}
+			      Acc|{Run T X Acc}
+			   end
+	       end
+	    end	    
+	 end
+      end
+      {Run X Y nil}
+   end
+end
+
+thread Result = {Counter X Y } end
+{Browse Result}
+X1 = e
+X = X1|X2
+Y1 = f
+Y = Y1|Y2
+X2 = f|X3
+Y2 = e|Y3
+Y3 = g|Y4
+   
