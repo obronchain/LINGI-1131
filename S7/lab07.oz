@@ -17,6 +17,7 @@ fun{GetI S I}
 end
 
 {Browse {GetI S 6}}
+
 %c) translation in kernel language
 
 declare IntsProc Sum2Proc GetIProc
@@ -42,7 +43,7 @@ local S1 S2 S3 in
    {Browse {GetI S2 2}}
 end
 
-%exercice 2
+%exercice 3
 declare
 %% Delay random time. Print job’s type. Bind the flag.
 proc {Job Type Flag}
@@ -51,10 +52,12 @@ proc {Job Type Flag}
    Flag=unit
 end
 
+
 %% BuildPs binds Ps to a tuple of process descriptions.
 %% Each process is assigned a random type
-proc {BuildPs N Ps}
-   Ps={Tuple.make ’#’ N}
+declare 
+proc{BuildPs N Ps}
+   Ps={Tuple.make '#' N}
    for I in 1..N do
       Type={OS.rand} mod 10
       Flag
@@ -62,9 +65,50 @@ proc {BuildPs N Ps}
       Ps.I=ps(type:Type job:proc {$} {Job Type Flag} end flag:Flag)
    end
 end
+
 %% Launching 100 processes
+
+declare N PS WaitPs
 N=100
 Ps={BuildPs N}
 for I in 1..N do
    thread {Ps.I.job} end
 end
+
+proc{WaitPs I Ps}
+   for C in 1..N do
+      if Ps.C.type==I then {Wait Ps.C.flag}
+      else skip end
+   end
+   {Browse 'all ended'}
+end
+{WaitPs 4 Ps}
+
+%exercice 4
+
+declare
+proc{WaitOr X Y}
+   local Val in
+      thread {Wait X} Val=unit end
+      thread {Wait Y} Val=unit end
+      {Wait Val}
+      {Browse 'One is Bound'}
+   end
+end
+
+declare X Y
+{WaitOr X Y}
+X = 1
+Y = 12
+
+%exo 5
+declare
+fun{WaitOrValue X Y}
+   local LocX={NewCell 0}  LocY={NewCell 0}  Val in
+      thread {Wait X} if @LocX==0 then LocY:= 1 Val=X else skip end end
+      thread {Wait Y} if @LocY==0 then LocX:= 1 Val=Y else skip end end
+      {Wait Val}
+      Val
+   end 
+end
+
