@@ -92,6 +92,56 @@ thread {Server S} end
 thread Result = {SafeSend P tamere 1000} end 
 {Browse Result}
 
-  
+%exo 9
+declare WriteOnPipe Counter Result X1 X2 X3 X4 X5 Y1 Y2 Y3 Y4 Y5 Z1 Z2 Z3 Z4 Z5 P S
+proc{WriteOnPipe L P}
+   case L of H|T then {Send P H} {WriteOnPipe T P} end
+end
+
+declare
+fun{Counter Ins}
+   local AddL Run in
+      fun{AddL L E}
+	 case L of nil then E#1|nil
+	 [] C#N|Next then
+	    if C==E then C#(N+1)|Next
+	    else C#N|{AddL Next E}
+	    end
+	 end
+      end
+
+     fun{Run In Actual}
+	 case In of nil then nil
+	 [] H|T then local Acc in
+			Acc = {AddL Actual H}
+			Acc|{Run T Acc}
+		     end
+	 end
+      end
       
+      {Run Ins nil}
+   end
+   
+end
       
+{NewPort S P}
+thread {WriteOnPipe X1 P} end
+thread {WriteOnPipe Y1 P} end
+thread {WriteOnPipe Z1 P} end
+thread Result={Counter S} end
+{Browse Result}
+X1 = e|X2
+Y1 = e|Y2
+Z1 = g|Z2
+
+%exo 10
+declare 
+fun{MergeTwoStream X Y}
+   local S P in
+      {NewPort S P}
+      thread {WriteOnPipe X P} end
+      thread {WriteOnPipe Y P} end
+      S
+   end
+end
+
