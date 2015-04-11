@@ -1,0 +1,43 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1343\cocoasubrtf160
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+
+\f0\b\fs24 \cf0 \ul \ulc0 Ex 3
+\b0 \ulnone \
+local\
+   X=x Y=y Z=z\
+in\
+   \{Browse [X Y Z]\}\
+end\
+\
+-> \'e7a donne: [x y z]\
+\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+
+\b \cf0 \ul \ulc0 Ex 5
+\b0 \ulnone \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+\cf0 local \
+   X1 X2 Square A B C \
+in\
+   A = 1\
+   B = 5\
+   C = ~150\
+   Square = \{Sqrt \{IntToFloat B*B-4*A*C\}\}\
+   \{Browse Square\}\
+   %X1 = (0-B-Square) / (2*A) % cette ligne bug, peut-etre une histoire de type (int, float etc)\
+   %X2 = (~B + Square) / (2*A)\
+   %\{Browse X1\}\
+   %\{Browse X2\}\
+end\
+\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+
+\b \cf0 \ul \ulc0 Ex 7
+\b0 \ulnone \
+a) 4 \'e9l\'e9ments (il y a le nil \'e0 la fin)\
+b) 5 \'e9l\'e9ments (il y a 2 nil) }

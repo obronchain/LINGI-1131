@@ -1,0 +1,94 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1343\cocoasubrtf160
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10120\viewh9060\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+
+\f0\fs24 \cf0 \
+\
+1) X = 1; Y = 2; Z = 2\
+Quand on arrive \'e0 X == 1, on attend car X n\'92est pas encore assign\'e9. Quand on arrive \'e0 X = 1, alors \'e7a d\'e9bloque X == 1 etc.\
+On peut mettre le Browse o\'f9 on veut car le Browse cr\'e9e un thread en interne si une valeur n\'92est pas assign\'e9e et la fait apparaitre quand elle devient assign\'e9e.\
+\
+\
+2) <s> est ex\'e9cut\'e9 quand X devient assign\'e9\
+\
+3) m\'eame logique\'85\
+\
+4) \
+{{\NeXTGraphic Pasted Graphic.tiff \width6000 \height5780
+}¬}\
+\
+declare\
+fun \{MergeSort L\}\
+   L1 L2\
+in\
+   case L\
+   of nil then nil\
+   [] [X] then [X]\
+   else\
+      \{Split L L1 L2\}\
+      \{Merge1 thread \{MergeSort L1\} end\
+              thread \{MergeSort L2\} end\}\
+   end\
+end\
+\
+% ex: \{Merge1 [1 2] [3 4 5 6]\} donne [1 2 3 4 5 6]\
+fun \{Merge1 L1 L2\}\
+   case L1|L2\
+   of (X1|M1)|(X2|M2) then\
+      if X1<X2 then X1|\{Merge1 M1 L2\}\
+      elseif X1>X2 then X2|\{Merge1 L1 M2\}\
+      else X1|X2|\{Merge1 M1 M2\} end\
+   [] L1|nil then L1\
+   [] nil|L2 then L2\
+   end\
+end\
+\
+% ex: \{Split [1 2 3 4 5] L1 L2\} donne L1 = [1 3 5] et L2 = [2 4]\
+proc \{Split L L1 L2\}\
+   case L\
+   of X1|X2|T then local M1 M2 in\
+		      L1=X1|M1\
+		      L2=X2|M2\
+		      \{Split T M1 M2\}\
+		   end\
+   [] [X] then L1=[X] L2=nil\
+   [] nil then L1=nil L2=nil\
+   end\
+end\
+\
+\
+\
+\
+\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+\cf0 nombre de split: 1 + 2 + 4 + \'85\
+= somme de z\'e9ro \'e0 n de 2^i\
+= (1-2^(h+1))/(-1)\
+= 2^(h+1)-1\
+= 2n - 1\
+\
+\
+5) stream = une liste dont la fin n\'92est pas li\'e9e\
+\
+\
+declare\
+fun \{Producer N\}\
+   local ProducerHelper in\
+      fun \{ProducerHelper N Acc\}\
+	 if Acc > N then nil\
+	 else Acc|\{ProducerHelper N Acc+1\}\
+	 end\
+      end\
+      \{ProducerHelper N 1\}\
+   end\
+end\
+\
+\
+7) le pannel ne fonctionne pas donc on ne sait pas faire cet exercice.\
+La conclusion est qu\'92on sait cr\'e9er vraiment beaucoup de threads en Oz (contrairement au C par exemple) car ils sont tr\'e8s peu chers car ce sont des \'ab\'a0vrais\'a0\'bb threads pas comme le C.\
+\
+\
+8) en fait il ne s\'92arr\'eate pas\'85 il y a une faute dans l\'92\'e9nonc\'e9. En fait le programme fonctionne bien, il faut essayer de le comprendre.}
