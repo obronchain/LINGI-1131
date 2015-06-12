@@ -137,7 +137,7 @@ end
 %c
 declare
 class PortClose from Port
-   meth close() port:=nil end
+   meth close @port=nil end
 end
 
 declare
@@ -145,7 +145,7 @@ fun {NewPortClose S}
    {New PortClose init(S)}
 end
 proc {Close P}
-   {P close()}
+   {P close}
 end
 
 declare
@@ -156,4 +156,3 @@ P={NewPortClose S}
 {Send P kikou}
 {Close P}
 
-%pourquoi close marche pas ?
