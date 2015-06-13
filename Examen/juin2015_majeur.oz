@@ -121,3 +121,178 @@ end
 %%%%%%%%%%%%%%%%%%
 % Aucunes idees de comment on fait pour tester ca
 % et non plus a quoi ca sert ....
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%              Question 3                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Implementer l'object passif Counter
+declare
+class Counter
+   attr v
+   meth init(Value)
+      v:=Value
+   end
+   meth inc
+      V in
+      V = @v +1
+      {Delay {OS.rand} mod 50}
+      v := V 
+   end
+   meth get(Value)
+      Value = @v
+   end
+end
+
+% preuve de mauvais fonctionnement
+local Obj X  in
+   Obj = {New Counter init(0)}
+   X= {MakeTuple 'l' 1000}
+   for I in 1..1000 do
+      thread
+	 for J in 1..1000 do Y in 
+	    {Obj inc}
+	    {Obj get(Y)}
+	 end
+	 X.I=unit
+      end
+   end
+
+   for I in 1..1000 do
+      {Wait X.I}
+   end
+
+   {Browse {Obj get($)}==1000*1000}
+end
+
+
+%Le rendre actif avec un code
+declare
+fun{NewActiveObject Class Init}
+   P S Loop Obj in
+   Obj = {New Class Init}
+   {NewPort S P}
+   proc{Loop S}
+      case S of
+	 H|T then {Obj H} {Loop T}
+      end
+   end
+   thread {Loop S} end 
+   proc{$ M}{Send P M} end 
+end
+
+local
+   Obj
+   X1 X2
+in
+   Obj={NewActiveObject Counter init(10)}
+   {Obj get(X1)}
+   {Browse X1}
+   {Obj inc}
+   {Obj get(X2)}
+   {Browse X2}
+end
+
+%Faire en sorte en utilisant un lock reantrant
+% que counter puisse etre utilise avec diff threads
+
+declare
+fun{NewLockReantrant}
+   CurThr = {NewCell unit}
+   Token = {NewCell unit}
+   Lock
+in
+   proc{Lock P}
+      if {Thread.this} == @CurThr then {Browse 'reantrant'} {P}
+      else Old New in
+	 {Exchange Token Old New}
+	 {Wait Old}
+	 CurThr := {Thread.this}
+	 try {P} finally
+	    CurThr := unit
+	    New = unit
+	 end
+      end
+   end
+   Lock
+end
+
+class CounterSave
+   attr v l
+   meth init(Value)
+      v:=Value
+      l:={NewLockReantrant}
+   end
+   meth inc
+      {@l proc{$}
+	     v := @v+1
+	  end
+       }
+   end  
+   meth get(Value)
+      {@l proc{$}
+	     Value = @v
+	  end
+       }
+   end
+end
+
+% preuve de bon fonctionnement
+local Obj X  in
+   Obj = {New CounterSave init(0)}
+   X= {MakeTuple 'l' 1000}
+   for I in 1..1000 do
+      thread
+	 for J in 1..100 do Y in 
+		{Obj inc}
+		{Obj get(Y)}
+	 end
+	 X.I=unit
+      end
+   end
+
+   for I in 1..1000 do
+      {Wait X.I}
+   end
+
+   {Browse {Obj get($)}==100*1000}
+end
+
+%faire la meme chose mais en utilisant exhance
+declare 
+class CounterExchange
+   attr v
+   meth init(V)
+      v := {NewCell V}
+   end
+   meth inc
+      New Old in
+      {Exchange @v Old New}
+      {Delay {OS.rand} mod 50}
+      New = Old+1
+   end
+   meth get(V)
+      {Exchange @v V V}
+   end
+end
+
+% preuve de bon fonctionnement
+local Obj X  in
+   Obj = {New CounterExchange init(0)}
+   X= {MakeTuple 'l' 1000}
+   for I in 1..1000 do
+      thread
+	 for J in 1..1000 do Y in 
+		{Obj inc}
+		{Obj get(Y)}
+	 end
+	 X.I=unit
+      end
+   end
+
+   for I in 1..1000 do
+      {Wait X.I}
+   end
+
+   {Browse {Obj get($)}==1000*1000}
+end
