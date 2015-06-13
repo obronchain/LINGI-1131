@@ -87,7 +87,7 @@ fun{ReplicaBehaviour Msg State}
 	 end
       end
       fun{IsIn L '#'(V1 A1 R1)}
-	 case L of nil then H|nil
+	 case L of nil then nil
 	 []'#'(V2 A2 R2)|T then if V1==V2 then
 				   '#'(V1 {Merge A1 A2} {Merge R1 R2})|T
 				else
@@ -111,7 +111,7 @@ fun{ORsetBehaviour Msg State}
 	    {Send List.({OS.rand} mod N +1) merge(S)}
 	    {Loop}
 	 end
-	 List.I = {NewPortObject ReplicaBehaviour (I nil nil)}
+	 List.I = {NewPortObject ReplicaBehaviour '#'(I nil nil)}
 	 thread {Loop} end 
       end
       List
