@@ -123,9 +123,9 @@ Y=99
 declare
 fun {Server}  % returns the port to use with this server
               % this is a more generic implementation
+   P S
    {NewPort S P} % P = {Port.new S}
-in
-   fun {Helper S}
+   proc {Helper S}
       case S of (Msg#Ack)|T then
 	 {Browse Msg}
 	 {Delay {OS.rand} mod 1000 + 500}
@@ -141,5 +141,52 @@ end
 
 declare
 Port = {Server}
-{Send Port hello|_}
-{Send Port world|_}
+{Send Port hello#_}
+{Send Port world#_}
+
+% ----
+% Ex 8
+% ----
+
+
+declare
+fun {SafeSend P M T}
+   Ack Timer
+in
+   {Send P M#Ack}
+   thread {Delay T} Timer = 1 end
+   {WaitTwo Ack Timer} == 1
+end
+
+
+
+% -----
+% Ex 10
+% -----
+
+
+declare
+fun {StreamMerger S1 S2}
+   S P
+   proc {HelpSender S}
+      case S of H|T then
+	    {Send P H}
+	    {HelpSender T}
+      end
+   end
+in
+   {NewPort S P}
+   thread {HelpSender S1} end
+   thread {HelpSender S2} end
+   S
+end
+
+      
+declare
+S1 S2
+S1 = hel|_
+S2 = lo|_
+{Browse {StreamMerger S1 S2}}
+{Delay 1000}
+S2 = lo|hehe|_
+S1 = hel|pfiou|_

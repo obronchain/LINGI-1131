@@ -50,7 +50,6 @@ B = 0−A
 
 
 % Exercice 2
-%pas fait
 declare
 fun {StudentRMI}
    S
@@ -63,29 +62,36 @@ in
    {NewPort S}
 end
 
-fun {StudentCallBack}
-   S
-in
-   thread
-      for ask(howmany:P) in S do
-	 {Send P {OS.rand} mod 24}
-      end
-   end
-   {NewPort S}
-end
-
-% this function contains a bug
-declare
 fun {CreateUniversity Size}
    fun {CreateLoop I}
       if I =< Size then
-	 {Student}|{CreateLoop I+1}
+	 {StudentRMI}|{CreateLoop I+1}
+      else
+	 nil
       end
    end
 in
    {CreateLoop 1}
 end
 
+%my function that helps Charlotte (min and max are not implemented)
+fun {HelpCharlotte PortList}
+   fun {HelpCharlotteHelper PortList State}
+      case PortList of nil then State
+      [] H|T then
+	 local Beers in
+	    {Send H ask(howmany:Beers)}
+	    {HelpCharlotteHelper T state(tot:State.tot+Beers number:State.number+1 max:State.max min:State.min)}
+	 end
+      end
+   end
+in
+   thread {HelpCharlotteHelper PortList state(tot:0 number:0 max:0 min:0)} end
+end
+
+
+declare
+{Browse {HelpCharlotte {CreateUniversity 10}}}
 
 
 % Exercice 3
@@ -109,7 +115,7 @@ fun {Porter}
       case Msg
       of getIn(N) then State+N
       [] getOut(N) then State-N
-      [] getCount(N) then N=State
+      [] getCount(N) then N=State %State %-> pas obligatoire... pourquoi?
       end
    end
 in
@@ -123,6 +129,8 @@ A={Porter}
 {Send A getOut(3)}
 {Send A getCount(C)}
 {Browse C}
+{Send A getIn(5)}
+{Browse {Send A getCount($)}}
 
 
 % Exercice 4
@@ -142,9 +150,9 @@ end
 fun {NewStack}
    fun {F Msg State}
       case Msg
-      of push(X) then {Browse 'je push'} 1 % a faire
-      [] pop(X) then {Browse 'je pop'} 2 % a faire
-      [] isEmpty(X) then {Browse 'suis je empty'} 3 % a faire
+      of push(S X) then S|X
+      [] pop(S) then case State of H|T then S=T H end
+      [] isEmpty(S) then S = State==nil State
       end
    end
 in

@@ -124,7 +124,7 @@ A=_
 B=_
 {WaitOr A B}
 {Browse 'finish'}
-
+% /!\ watch out! error if A and B are both bounded
 
 % ----
 % Ex 5

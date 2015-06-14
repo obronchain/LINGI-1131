@@ -71,10 +71,7 @@ fun {NewPort2 S}
 end
 
 proc {Send2 C Msg}
-   A B
-in
-   A|B = @C
-   C := Msg|A|B|_
+   C := @C|Msg
 end
 
 % tests 1
