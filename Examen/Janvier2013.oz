@@ -116,4 +116,61 @@ in
 end
 
 
-      
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%          Question1          %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+declare
+fun{LiftToStream2 F Xs Ys}
+   fun lazy {Loop X Y}
+      case X|Y of
+	 (H1|T1)|(H2|T2) then {F H1 H2}|{Loop T1 T2}
+      end
+   end
+in
+   thread {Loop Xs Ys} end
+end
+
+fun{LiftToStream1 F Xs}
+   fun lazy {Loop X}
+      case X of
+	 H|T then {F H}|{Loop T}
+      end
+   end
+in
+   thread {Loop Xs} end
+end
+
+fun{AddList A B}
+   case A|B of nil|nil then nil
+   [] (H1|T1)|(H2|T2) then H1+H2|{AddList T1 T2}
+   end
+end
+
+fun{ShiftLeft A}
+   case A of nil then 0|nil
+   [] H|T then H|{ShiftLeft T}
+   end
+end
+fun{ShiftRight A}
+   0|A
+end
+proc{Touch L N}
+   if (N>0) then
+      {Wait L.1}
+      case L of H|T then
+	 {Browse H} {Touch T N-1}
+      end
+   else
+      skip
+   end
+end
+
+local
+   R L H
+in
+   R = {LiftToStream1 ShiftRight H}
+   L = {LiftToStream1 ShiftLeft H}
+   H = [1]|{LiftToStream2 AddList R L}
+   {Touch H 10}
+end
+
