@@ -62,17 +62,17 @@ end
 % -> illustrated by the methode depositGood
 declare
 class BankAccount
-   attr cash
+   attr cash l
    meth init()
       cash := 0
+      lock := {NewLock}
    end
    meth depositWrong(Amount)
       cash := @cash + Amount
    end
    meth depositGood(Amount)
-      local X L in
-	 L = {NewLock}
-	 lock L then
+      local X in
+	 lock @l then
 	    X = @cash
 	    cash := X + Amount
 	 end
@@ -82,11 +82,8 @@ class BankAccount
       cash := @cash - Amount
    end
    meth withdrawGood(Amount)
-      local L in
-	 L = {NewLock}
-	 lock L then
-	    cash := @cash - Amount
-	 end
+      lock @l then
+	 cash := @cash - Amount
       end
    end
    meth getBalance($)
