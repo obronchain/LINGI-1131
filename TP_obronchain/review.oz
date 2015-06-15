@@ -349,7 +349,158 @@ end
 
 {Browse {Josephus 11 3}}
 
-   
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%      Bounded Buffer             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Creer un bounded buffer
+% Implementer un Monitor
 
-	     
-	     
+declare
+fun{NewQueu}
+   X in
+   q(0 X X)
+end
+
+fun{Insert q(N S E) X}
+   E1 in
+   E = X|E1
+   q(N+1 S E1)
+end
+
+fun{DeleteNonBloc q(N S E) X}
+   H S1 in
+   if N>0 then
+      S = H|S1
+      X=[H]
+      q(N-1 S1 E)
+   else
+      X=nil
+      q(N S E)
+   end
+end
+
+fun{Delete q(N S E) X}
+   S1 in
+   S = X|S1
+   q(N-1 S1 E)
+end
+
+
+fun{DeleteAll q(N S E) L}
+   X in
+   L = S
+   E = nil
+   q(0 X X)
+end
+
+declare
+proc{Monitor LockM WaitM NotifyM NotifyAll}
+   Token1 = {NewCell unit}
+   Token2 = {NewCell unit}
+   CurThr = {NewCell unit}
+   Q = {NewCell {NewQueu}}
+   fun{GetLock}
+      if {Thread.this}==@CurThr then false
+      else
+	 Old New in
+	 {Exchange Token1 Old New}
+	 {Wait Old}
+	 CurThr := {Thread.this}
+	 Token2 := New
+	 true
+      end
+   end
+
+   proc{ReleaseLock}
+      CurThr := unit
+      @Token2 = unit
+   end
+in
+   proc{LockM P}
+      if {GetLock} then
+	 {P}
+	 {ReleaseLock}
+      else
+	 {P}
+      end
+   end
+
+   proc{WaitM}
+      X
+   in
+      Q := {Insert @Q X}
+      {ReleaseLock}
+      {Wait X}
+      if{GetLock} then skip end
+   end
+
+   proc{NotifyM}
+      X in
+      {Browse [@Q X]}
+      Q := {DeleteNonBloc @Q X}
+      case X of [H] then H=unit
+      else skip
+      end
+   end
+
+   proc{NotifyAll}
+      L in
+      Q := {DeleteAll @Q L}
+      {ForAll L proc{$ X} X=unit end }
+   end
+end
+
+declare
+fun{NewActiveObject Class Init}
+   S P
+   Obj
+   proc{Loop L}
+      case L of  H|T then
+	 {Obj H} {Loop T}
+      end
+   end
+in
+   Obj={New Class Init}
+   {NewPort S P}
+   thread {Loop S} end
+   proc{$ Msg} {Send P Msg} end
+end
+
+declare
+proc{Buffer Get Put N}
+   LockM WaitM NotifyM NotifyAll
+   Q = {NewCell {NewQueu}}
+in
+   {Monitor LockM WaitM NotifyM NotifyAll}
+   Put= proc{$ X}
+      {LockM proc{$}
+		if @Q.1>N then {WaitM} {Put X}
+		else
+		   Q:={Insert @Q X}
+		   {NotifyM}
+		end
+	     end
+      }
+   end
+   proc{Get X}
+      {LockM proc{$}
+		if @Q.1==0 then {WaitM} {Get X}
+		else
+		   Q := {Delete @Q X}
+		   {NotifyM}
+		end
+	     end
+      }
+  end
+end
+
+local
+   Get Put X
+in
+   {Buffer Get Put 10}
+   {Put 42}
+   {Get X}
+end
+
+   
+  
